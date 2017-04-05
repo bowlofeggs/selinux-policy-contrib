@@ -1,0 +1,81 @@
+policy_module(ejabberd,0.0)
+
+
+require {
+    type net_conf_t;
+    class lnk_file read;
+    class tcp_socket { accept bind connect create getattr getopt listen setopt };
+    class udp_socket { bind connect create getattr getopt setopt };
+    class unix_dgram_socket { connect create getopt setopt };
+}
+
+
+# Private type declarations
+type ejabberd_t;
+type ejabberd_exec_t;
+type ejabberd_var_lib_t;
+type ejabberd_var_log_t;
+
+files_type(ejabberd_var_lib_t)
+
+init_daemon_domain(ejabberd_t, ejabberd_exec_t)
+
+type ejabberd_unit_file_t;
+systemd_unit_file(ejabberd_unit_file_t)
+
+domain_type(ejabberd_t)
+domain_entry_file(ejabberd_t, ejabberd_exec_t)
+
+logging_log_file(ejabberd_var_log_t)
+
+
+# What will we allow
+allow ejabberd_t net_conf_t:lnk_file read;
+
+allow ejabberd_t self:tcp_socket { accept bind connect create getattr getopt listen setopt };
+allow ejabberd_t self:udp_socket { bind connect create getattr getopt setopt };
+allow ejabberd_t self:unix_dgram_socket { connect create getopt setopt };
+allow ejabberd_t self:unix_stream_socket create_stream_socket_perms;
+
+auth_read_passwd(ejabberd_t)
+
+corecmd_exec_bin(ejabberd_t)
+corecmd_exec_shell(ejabberd_t)
+corecmd_mmap_bin_files(ejabberd_t)
+corecmd_shell_entry_type(ejabberd_t)
+
+corenet_tcp_bind_epmd_port(ejabberd_t)
+corenet_tcp_bind_generic_node(ejabberd_t)
+corenet_tcp_bind_generic_port(ejabberd_t)
+corenet_tcp_bind_jabber_client_port(ejabberd_t)
+corenet_tcp_bind_jabber_interserver_port(ejabberd_t)
+corenet_tcp_connect_epmd_port(ejabberd_t)
+corenet_tcp_connect_generic_port(ejabberd_t)
+corenet_tcp_connect_jabber_interserver_port(ejabberd_t)
+
+corenet_udp_bind_generic_node(ejabberd_t)
+
+dev_list_sysfs(ejabberd_t)
+dev_read_rand(ejabberd_t)
+dev_read_sysfs(ejabberd_t)
+
+files_rw_etc_files(ejabberd_t)
+files_var_lib_filetrans(ejabberd_t, ejabberd_var_lib_t, dir)
+
+kernel_dgram_send(ejabberd_t)
+
+logging_create_devlog_dev(ejabberd_t)
+logging_log_filetrans(ejabberd_t, ejabberd_var_log_t, { dir file })
+
+manage_dirs_pattern(ejabberd_t, ejabberd_var_lib_t, ejabberd_var_lib_t)
+manage_dirs_pattern(ejabberd_t, ejabberd_var_log_t, ejabberd_var_log_t)
+manage_files_pattern(ejabberd_t, ejabberd_var_lib_t, ejabberd_var_lib_t)
+manage_files_pattern(ejabberd_t, ejabberd_var_log_t, ejabberd_var_log_t)
+
+miscfiles_read_generic_certs(ejabberd_t)
+
+networkmanager_read_pid_files(ejabberd_t)
+
+sysnet_read_config(ejabberd_t)
+
+fs_associate(ejabberd_var_lib_t)

@@ -1,0 +1,36 @@
+########################################
+## <summary>
+##	All of the rules required to
+##	administrate an ejabberd environment.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+## <param name="role">
+##	<summary>
+##	Role allowed access.
+##	</summary>
+## </param>
+## <rolecap/>
+#
+interface(`ejabberd_admin',`
+	gen_require(`
+		type ejabberd_t, ejabberd_exec_t;
+		type ejabberd_var_lib_t, ejabberd_var_log_t;
+	')
+
+	allow $1 { ejabberd_t }:process { ptrace signal_perms };
+	ps_process_pattern($1, ejabberd_t)
+
+	domain_system_change_exemption($1)
+	role_transition $2 ejabberd_exec_t system_r;
+	allow $2 system_r;
+
+	files_search_var_lib($1)
+	admin_pattern($1, ejabberd_var_lib_t)
+
+	logging_search_logs($1)
+	admin_pattern($1, ejabberd_var_log_t)
+')
